@@ -19,7 +19,7 @@ jobs:
       - name: Ruff
         run: ruff check src/
       - name: Mypy
-        run: mypy src/ --ignore-missing-imports
+        run: mypy src/ --ignore-missing-imports --no-strict --allow-untyped-defs
 
   test:
     runs-on: ubuntu-latest

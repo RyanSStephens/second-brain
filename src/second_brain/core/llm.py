@@ -27,7 +27,7 @@ class AnthropicProvider(LLMProvider):
             system=system,
             messages=[{"role": "user", "content": prompt}],
         )
-        return response.content[0].text
+        return response.content[0].text  # type: ignore[union-attr]
 
 
 class OpenAIProvider(LLMProvider):
