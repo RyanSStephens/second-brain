@@ -14,6 +14,7 @@ class Embedder(Protocol):
 class SentenceTransformerEmbedder:
     def __init__(self, model_name: str = "all-MiniLM-L6-v2") -> None:
         from sentence_transformers import SentenceTransformer
+
         self._model = SentenceTransformer(model_name)
 
     def embed(self, texts: list[str]) -> list[list[float]]:
@@ -24,7 +25,9 @@ class SentenceTransformerEmbedder:
 class OpenAIEmbedder:
     def __init__(self, model_name: str = "text-embedding-3-small") -> None:
         import os
+
         import openai
+
         self._client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY", ""))
         self._model = model_name
 
@@ -33,7 +36,9 @@ class OpenAIEmbedder:
         return [item.embedding for item in resp.data]
 
 
-def create_embedder(backend: str = "sentence-transformers", model: str = "all-MiniLM-L6-v2") -> Embedder:
+def create_embedder(
+    backend: str = "sentence-transformers", model: str = "all-MiniLM-L6-v2"
+) -> Embedder:
     if backend == "sentence-transformers":
         return SentenceTransformerEmbedder(model)
     elif backend == "openai":

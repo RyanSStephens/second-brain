@@ -44,13 +44,15 @@ def chunk_document(
             continue
 
         if len(current_text) + len(para) + 2 > chunk_size and current_text:
-            chunks.append(Chunk(
-                content=current_text.strip(),
-                source=source,
-                doc_title=doc_title,
-                chunk_index=chunk_index,
-                doc_type=doc_type,
-            ))
+            chunks.append(
+                Chunk(
+                    content=current_text.strip(),
+                    source=source,
+                    doc_title=doc_title,
+                    chunk_index=chunk_index,
+                    doc_type=doc_type,
+                )
+            )
             chunk_index += 1
 
             # Keep overlap from end of current chunk
@@ -62,18 +64,22 @@ def chunk_document(
                     break
                 overlap_words.insert(0, w)
                 overlap_len += len(w) + 1
-            current_text = " ".join(overlap_words) + "\n\n" + para if overlap_words else para
+            current_text = (
+                " ".join(overlap_words) + "\n\n" + para if overlap_words else para
+            )
         else:
             current_text = current_text + "\n\n" + para if current_text else para
 
     # Last chunk
     if current_text.strip():
-        chunks.append(Chunk(
-            content=current_text.strip(),
-            source=source,
-            doc_title=doc_title,
-            chunk_index=chunk_index,
-            doc_type=doc_type,
-        ))
+        chunks.append(
+            Chunk(
+                content=current_text.strip(),
+                source=source,
+                doc_title=doc_title,
+                chunk_index=chunk_index,
+                doc_type=doc_type,
+            )
+        )
 
     return chunks

@@ -1,19 +1,26 @@
 from __future__ import annotations
 
 import shutil
-from pathlib import Path
-from contextlib import asynccontextmanager
 from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+from pathlib import Path
 
-from fastapi import FastAPI, UploadFile, File, HTTPException, Depends, Query
+from fastapi import Depends, FastAPI, File, HTTPException, Query, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from second_brain.core.config import get_settings
-from second_brain.rag.knowledge_base import KnowledgeBase
-from second_brain.storage.database import init_db, get_db, log_document, log_query, list_documents, list_queries
 from second_brain.api.auth import require_api_key
 from second_brain.api.metrics import MetricsMiddleware
 from second_brain.api.streaming import router as streaming_router
+from second_brain.core.config import get_settings
+from second_brain.rag.knowledge_base import KnowledgeBase
+from second_brain.storage.database import (
+    get_db,
+    init_db,
+    list_documents,
+    list_queries,
+    log_document,
+    log_query,
+)
 
 settings = get_settings()
 kb: KnowledgeBase | None = None
@@ -62,6 +69,7 @@ async def get_metrics():
 
 # --- Ingest (requires API key) ---
 
+
 @app.post("/api/v1/ingest/file")
 async def ingest_file(
     file: UploadFile = File(...),
@@ -79,7 +87,9 @@ async def ingest_file(
     if chunk_count == 0:
         raise HTTPException(400, f"Could not parse file: {file.filename}")
 
-    await log_document(db, file.filename, str(file_path), file_path.suffix.lstrip("."), chunk_count)
+    await log_document(
+        db, file.filename, str(file_path), file_path.suffix.lstrip("."), chunk_count
+    )
 
     return {
         "filename": file.filename,
@@ -108,6 +118,7 @@ async def ingest_directory(
 
 
 # --- Query (requires API key) ---
+
 
 @app.post("/api/v1/ask")
 async def ask(
@@ -145,6 +156,7 @@ async def search(
 
 
 # --- Management (requires API key) ---
+
 
 @app.get("/api/v1/documents")
 async def get_documents(

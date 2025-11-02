@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import time
 import logging
+import time
 from collections import defaultdict
 
 from fastapi import Request, Response
@@ -43,7 +43,9 @@ class MetricsMiddleware(BaseHTTPMiddleware):
 
         # Log slow requests
         if latency > 5.0:
-            logger.warning("Slow request: %s %s took %.2fs", request.method, path, latency)
+            logger.warning(
+                "Slow request: %s %s took %.2fs", request.method, path, latency
+            )
 
         response.headers["X-Response-Time"] = f"{latency:.4f}"
         return response
@@ -56,7 +58,9 @@ class MetricsMiddleware(BaseHTTPMiddleware):
                 endpoint_stats[path] = {
                     "count": len(latencies),
                     "avg_ms": round(sum(latencies) / len(latencies) * 1000, 2),
-                    "p95_ms": round(sorted(latencies)[int(len(latencies) * 0.95)] * 1000, 2),
+                    "p95_ms": round(
+                        sorted(latencies)[int(len(latencies) * 0.95)] * 1000, 2
+                    ),
                     "max_ms": round(max(latencies) * 1000, 2),
                 }
 

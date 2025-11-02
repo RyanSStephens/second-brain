@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from second_brain.core.config import get_settings
 from second_brain.storage.models import Base, Document, QueryLog
@@ -21,13 +21,19 @@ async def get_db() -> AsyncSession:  # type: ignore[misc]
         yield session
 
 
-async def log_document(db: AsyncSession, title: str, source: str, doc_type: str, chunk_count: int) -> None:
-    doc = Document(title=title, source=source, doc_type=doc_type, chunk_count=chunk_count)
+async def log_document(
+    db: AsyncSession, title: str, source: str, doc_type: str, chunk_count: int
+) -> None:
+    doc = Document(
+        title=title, source=source, doc_type=doc_type, chunk_count=chunk_count
+    )
     db.add(doc)
     await db.commit()
 
 
-async def log_query(db: AsyncSession, question: str, answer: str, sources_used: int) -> None:
+async def log_query(
+    db: AsyncSession, question: str, answer: str, sources_used: int
+) -> None:
     entry = QueryLog(question=question, answer=answer, sources_used=sources_used)
     db.add(entry)
     await db.commit()

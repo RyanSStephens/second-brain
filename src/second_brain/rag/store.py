@@ -21,7 +21,9 @@ class SearchResult:
 
 
 class VectorStore:
-    def __init__(self, collection_name: str = "second_brain", persist_dir: str | None = None) -> None:
+    def __init__(
+        self, collection_name: str = "second_brain", persist_dir: str | None = None
+    ) -> None:
         if persist_dir:
             self._client = chromadb.PersistentClient(path=persist_dir)
         else:
@@ -42,12 +44,15 @@ class VectorStore:
             ids=[c.chunk_id for c in chunks],
             documents=[c.content for c in chunks],
             embeddings=embeddings,
-            metadatas=[{
-                "source": c.source,
-                "doc_title": c.doc_title,
-                "chunk_index": c.chunk_index,
-                "doc_type": c.doc_type,
-            } for c in chunks],
+            metadatas=[
+                {
+                    "source": c.source,
+                    "doc_title": c.doc_title,
+                    "chunk_index": c.chunk_index,
+                    "doc_type": c.doc_type,
+                }
+                for c in chunks
+            ],
         )
 
     def query(self, embedding: list[float], top_k: int = 8) -> list[SearchResult]:
@@ -65,14 +70,16 @@ class VectorStore:
         for i, cid in enumerate(results["ids"][0]):
             dist = results["distances"][0][i] if results["distances"] else 0.0
             meta = results["metadatas"][0][i] if results["metadatas"] else {}
-            search_results.append(SearchResult(
-                chunk_id=cid,
-                content=results["documents"][0][i] if results["documents"] else "",
-                source=meta.get("source", ""),
-                doc_title=meta.get("doc_title", ""),
-                score=1.0 - dist,
-                metadata=meta,
-            ))
+            search_results.append(
+                SearchResult(
+                    chunk_id=cid,
+                    content=results["documents"][0][i] if results["documents"] else "",
+                    source=meta.get("source", ""),
+                    doc_title=meta.get("doc_title", ""),
+                    score=1.0 - dist,
+                    metadata=meta,
+                )
+            )
         return search_results
 
     def delete_by_source(self, source: str) -> None:

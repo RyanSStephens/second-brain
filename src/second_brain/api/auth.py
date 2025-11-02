@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import os
 import secrets
-from functools import wraps
 
-from fastapi import HTTPException, Security, Depends
+from fastapi import HTTPException, Security
 from fastapi.security import APIKeyHeader
 
 API_KEY_HEADER = APIKeyHeader(name="X-API-Key", auto_error=False)

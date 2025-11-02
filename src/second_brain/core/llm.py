@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import os
-from typing import AsyncIterator
 from abc import ABC, abstractmethod
 
 import anthropic

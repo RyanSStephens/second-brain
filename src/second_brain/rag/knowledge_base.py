@@ -6,9 +6,9 @@ from pathlib import Path
 from second_brain.core.config import get_settings
 from second_brain.core.llm import get_llm_provider
 from second_brain.parsers.documents import parse_file
-from second_brain.rag.chunker import chunk_document, Chunk
-from second_brain.rag.embedder import create_embedder, Embedder
-from second_brain.rag.store import VectorStore, SearchResult
+from second_brain.rag.chunker import chunk_document
+from second_brain.rag.embedder import Embedder, create_embedder
+from second_brain.rag.store import SearchResult, VectorStore
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +90,10 @@ class KnowledgeBase:
 
         if not results:
             return {
-                "answer": "I don't have any relevant information in the knowledge base to answer that.",
+                "answer": (
+                    "I don't have any relevant information "
+                    "in the knowledge base to answer that."
+                ),
                 "sources": [],
                 "context_used": 0,
             }
@@ -101,9 +104,7 @@ class KnowledgeBase:
         for r in results:
             if r.score < 0.1:
                 continue
-            context_parts.append(
-                f"[Source: {r.doc_title} ({r.source})]\n{r.content}"
-            )
+            context_parts.append(f"[Source: {r.doc_title} ({r.source})]\n{r.content}")
             sources_seen.add(r.source)
 
         context = "\n\n---\n\n".join(context_parts) if context_parts else ""
@@ -119,7 +120,8 @@ class KnowledgeBase:
             "answer": answer,
             "sources": [
                 {"source": r.source, "title": r.doc_title, "score": round(r.score, 3)}
-                for r in results if r.score >= 0.1
+                for r in results
+                if r.score >= 0.1
             ],
             "context_used": len(context_parts),
         }

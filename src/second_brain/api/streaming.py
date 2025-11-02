@@ -34,12 +34,14 @@ async def _stream_answer(question: str, top_k: int) -> AsyncIterator[str]:
     # Send retrieved sources first
     sources = [
         {"source": r.source, "title": r.doc_title, "score": round(r.score, 3)}
-        for r in results if r.score >= 0.1
+        for r in results
+        if r.score >= 0.1
     ]
     yield f"event: sources\ndata: {json.dumps(sources)}\n\n"
 
     if not results or all(r.score < 0.1 for r in results):
-        yield f"event: token\ndata: I don't have relevant information to answer that.\n\n"
+        msg = "I don't have relevant information to answer that."
+        yield f"event: token\ndata: {msg}\n\n"
         yield "event: done\ndata: {}\n\n"
         return
 
@@ -55,8 +57,12 @@ async def _stream_answer(question: str, top_k: int) -> AsyncIterator[str]:
     try:
         if settings.llm_provider == "anthropic":
             import anthropic
+
             client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
-            system = "You are a helpful assistant for a personal knowledge base. Answer based on the provided context. Cite sources."
+            system = (
+                "You are a helpful assistant for a personal knowledge base. "
+                "Answer based on the provided context. Cite sources."
+            )
             prompt = f"Context:\n{context}\n\nQuestion: {question}"
 
             async with client.messages.stream(
@@ -72,14 +78,17 @@ async def _stream_answer(question: str, top_k: int) -> AsyncIterator[str]:
             # Fallback to non-streaming for other providers
             llm = get_llm_provider()
             answer = await llm.generate(
-                system="You are a helpful assistant. Answer based on context. Cite sources.",
+                system=(
+                    "You are a helpful assistant. "
+                    "Answer based on context. Cite sources."
+                ),
                 query=question,
                 context=f"Context:\n{context}",
             )
             # Simulate streaming by chunking
             words = answer.split(" ")
             for i in range(0, len(words), 3):
-                chunk = " ".join(words[i:i+3])
+                chunk = " ".join(words[i : i + 3])
                 if i > 0:
                     chunk = " " + chunk
                 yield f"event: token\ndata: {json.dumps(chunk)}\n\n"

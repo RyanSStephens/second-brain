@@ -45,7 +45,7 @@ def parse_pdf(file_path: Path) -> dict:
     for i, page in enumerate(reader.pages):
         text = page.extract_text()
         if text:
-            pages.append(f"[Page {i+1}]\n{text}")
+            pages.append(f"[Page {i + 1}]\n{text}")
 
     content = "\n\n".join(pages)
     title = file_path.stem
